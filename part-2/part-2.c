@@ -1,45 +1,46 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 int main(int argc, char** argv){
 	bool add;
-	if(argc==1)
-		return 0;
-	add = (argv[1] == '+');
-	int size = 0;
-	//char key[] = argv.slice(3);
-	for(int i=3; i<argc; i++){
-		size = size + sizeof(argv[i]);
+	int size =0;
+	if(argc > 1){
+		add = (argv[1][0] == '+');
+		size = strlen(argv[1])-2;		
+		//char key[]; //override
+		//strcpy(key, &argv[1][2]); // copying the rest of the string to the key (i need the integers) 
 	}
 	char key[size];
-	int index = 0;
-	for(int i=3; i<argc; i++){
-		for(int j=0;j<sizeof(argv[i]);j++)
-			key[index++] = argv[i][j];
-	}
-	
-	
-
+	if(size > 0)
+		 strcpy(key, &argv[1][2]);// copying the rest of the string to the key (i need the integers) 
+	printf("%s",key);
 	FILE *infile = stdin;
 	FILE *outfile = stdout;
-	while(!feof(infile)){
-		char *c = fgetc(infile);
-
-	}
-	
-
-
-	bool debugMode = true;
-	for( int i=1; i< argc; i++){
-		if(debugMode){
-			fprintf(stderr, "%s\n", argv[i]);
+	int i=0;
+	int sign = add ? 1 : -1; 
+	int c;
+	while(!feof(stdin)){ 
+		c = fgetc(infile);
+		if((argc>1)&& (((c <= 'z') & (c >= 'a'))||((c >= '0') & (c <= '9')))){ // the first condition is due to the assumption
+			if(((c <= 'z') & (c >= 'a'))){ 
+				if(c=='z') 
+					fputc(('a'+ (sign)*key[i]-1-97)%26,outfile);
+				else
+					fputc((c+(sign)*key[i]-97)%26,outfile); 
+			}
+			else {
+				if(((c >= '0') & (c <= '9'))){
+					if(c=='9')
+						fputc(('0'+(sign)*key[i]-1-48)%10,outfile);
+					else 
+						fputc((c+((sign)*key[i]-48)%10)%10,outfile); // need to check- the last thing i did 
+				}
+			}				
+				i = (i==strlen(key)) ? 0 : i+1;
 		}
 		else
-			printf("%s ",argv[i]);
-		if(argv[i]=="+D")
-			debugMode = true;
-		if(argv[i]=="-D")
-			debugMode = false;
+			fputc(c,outfile);
+
 	}
-	printf("\n");
 	return 0;
 }
