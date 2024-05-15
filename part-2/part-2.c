@@ -7,40 +7,42 @@ int main(int argc, char** argv){
 	if(argc > 1){
 		add = (argv[1][0] == '+');
 		size = strlen(argv[1])-2;		
-		//char key[]; //override
-		//strcpy(key, &argv[1][2]); // copying the rest of the string to the key (i need the integers) 
 	}
 	char key[size];
 	if(size > 0)
-		 strcpy(key, &argv[1][2]);// copying the rest of the string to the key (i need the integers) 
-	printf("%s",key);
+		 strcpy(key, &argv[1][2]);// copying the rest of the string to the key  
 	FILE *infile = stdin;
 	FILE *outfile = stdout;
 	int i=0;
-	int sign = add ? 1 : -1; 
 	int c;
-	while(!feof(stdin)){ 
+	int out;
+	while(!feof(infile)){ 
 		c = fgetc(infile);
 		if((argc>1)&& (((c <= 'z') & (c >= 'a'))||((c >= '0') & (c <= '9')))){ // the first condition is due to the assumption
-			if(((c <= 'z') & (c >= 'a'))){ 
-				if(c=='z') 
-					fputc(('a'+ (sign)*key[i]-1-97)%26,outfile);
-				else
-					fputc((c+(sign)*key[i]-97)%26,outfile); 
+			if(((c <= 'z') & (c >= 'a'))){
+				if(add)
+					fputc(97+(c+key[i]-48-97)%26,outfile);
+				else 
+				{
+					out = c-97-key[i]+48;
+					(out<0) ? fputc(97+26+out,outfile) :  fputc(97+out,outfile);
+				}
 			}
 			else {
 				if(((c >= '0') & (c <= '9'))){
-					if(c=='9')
-						fputc(('0'+(sign)*key[i]-1-48)%10,outfile);
-					else 
-						fputc((c+((sign)*key[i]-48)%10)%10,outfile); // need to check- the last thing i did 
-				}
+					if(add)
+						fputc(48+(c+key[i]-2*48)%10,outfile);
+					else
+					{
+						out = c-key[i];
+						(out < 0) ? fputc(48+10+out,outfile) : fputc(48+out,outfile);
+					}		
+				} 
 			}				
-				i = (i==strlen(key)) ? 0 : i+1;
+				i = (i== strlen(key)-1) ? 0 : i+1;
 		}
 		else
 			fputc(c,outfile);
-
 	}
 	return 0;
 }
