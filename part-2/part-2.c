@@ -25,7 +25,8 @@ int main(int argc, char** argv){
 	int size =0;
 	if(argc > 1){
 		add = (argv[1][0] == '+');
-		size = mystrlen(argv[1])-2;	
+		if(argv[1][1]=='e')
+			size = mystrlen(argv[1])-2;	
 	}
 	char key[size];
 	if(size > 0)

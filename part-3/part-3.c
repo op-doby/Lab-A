@@ -26,23 +26,43 @@ int main(int argc, char** argv){
 	char key[size];
 	FILE *infile = stdin;
 	FILE *outfile = stdout;
+	bool debugMode = true;
 	if(argc > 1){
 		for(int i=1; i<argc; i++){
-			if(mystrlen(argv[i]>2)){
-				if(argv[i][0]=="-"){
+			if(debugMode)
+				fprintf(stderr, "debug mode: %s\n", argv[i]);
+			else
+				printf("%s",argv[i]);
+			if((argv[i][0]=='+') && (argv[i][1]=='D') && (argv[i][2]==(char)0))
+				debugMode = true;
+			if((argv[i][0]=='-') && (argv[i][1]=='D') && (argv[i][2]==(char)0))
+				debugMode = false;
+			if(mystrlen(argv[i])>2){
+				if(argv[i][0]=='-'){
 					if(argv[i][1]=='e'){
 						add = false;
 						size = mystrlen(argv[1])-2;	
 						if(size > 0)
 		 					mystrcpy(key, &argv[i][2]);// copying the rest of the string to the key  
 					}
-					if(argv[i][1]=='I') 
-						infile=fopen(argv[i][2],"w");
-					if(argv[i][1]=='O') 
-						outfile=fopen(argv[i][2],"r");
+					if(argv[i][1]=='I') {
+						infile=fopen(&argv[i][2],"rb");
+						if(infile==NULL){
+							fprintf(stderr,"%s","couldn't open the in file ");
+							return 1;
+						}
+
+					}
+					if(argv[i][1]=='O') {
+						outfile=fopen(&argv[i][2],"w");
+						if(outfile==NULL){
+							fprintf(stderr,"%s","couldn't open the out file ");
+							return 1;
+						}
+					}
 				}
 				else 
-					if(argv[i][0]=="+"){
+					if((argv[i][0]=='+') && (argv[i][1]=='e')){
 						add = true;
 						size = mystrlen(argv[1])-2;	
 						if(size > 0)
